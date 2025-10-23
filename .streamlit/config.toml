@@ -1,0 +1,19 @@
+[server]
+enableStaticServing = true
+
+
+[theme]
+base = "light"
+font = "SF Pro"
+baseFontSize = 16
+primaryColor = "#255af7"
+backgroundColor = "#f2f2f2"
+secondaryBackgroundColor = "#ffff"
+
+
+[[theme.fontFaces]]
+family = "SF Pro" # This name must match the font name in the config and the CSS selector
+url = "./static/SF-Pro-Display-Regular.woff2" # Path to your font file
+weight = 400 # Optional: specify the font weight
+style = "normal" # Optional: specify the font style
+
