@@ -1,14 +1,8 @@
 # EA SPORTS FC 25 PLAYER
-
 import streamlit as st
 import os
 import pandas as pd
 import plotly.express as px
-
-
-font = "sans-serif"
-headingFont = "sans-serif"
-codeFont = "monospace"
 
 
 st.set_page_config(
@@ -77,8 +71,8 @@ fig1 = px.bar(
 # Hide the x-axis
 fig1.update_layout(
     xaxis=dict(
-        showticklabels=False,  # hide numbers
-        title="Overall",       # remove axis title
+        showticklabels=False, 
+        title="Overall",
     )
 )
 
@@ -87,15 +81,15 @@ fig1.update_layout(
 fig1.update_traces(
      textposition="outside",
      hovertemplate=(
-          "<b>%{y}</b><br>"            # bold player name
-          "Overall: %{x}<br>"          # overall rating
+          "<b>%{y}</b><br>"           
+          "Overall: %{x}<br>"         
           "Team: %{customdata[0]}<br>" 
           "Age: %{customdata[1]}<extra></extra><br>"
      ),
      customdata=top_players[["Team", "Age"]],
 )
-
 st.plotly_chart(fig1, use_container_width=True)
+
 
 # Rating Distribution
 st.subheader("Distribution of Overall Ratings")
@@ -105,10 +99,11 @@ fig2 = px.histogram(
      nbins=20,
      title="Overall Rating Distribution")
 
+
 fig2.update_layout(
     xaxis=dict(
-        showticklabels=True,  # hide numbers
-        title="Overall",       # remove axis title
+        showticklabels=True,  
+        title="Overall",       
     )
 )
 st.plotly_chart(fig2, use_container_width=True)
@@ -127,6 +122,7 @@ nat_df = (
 fig3 = px.bar(nat_df, x="Nation", y="Ovr", color="Nation", text="Ovr")
 fig3.update_traces(textposition="outside")
 st.plotly_chart(fig3, use_container_width=True)
+
 
 # --- PLAYER COMPARISON ---
 st.markdown("---")
@@ -153,9 +149,11 @@ fig4 = px.line_polar(
     r="Score",
     theta="Attribute",
     color="Player",
-    line_close=True,
-    title=f"{p1} vs {p2} — Attribute Comparison"
+    line_close=True,  # Don't connect the last to the first point
+    title=f"{p1} vs {p2} — Attribute Comparison",
+    color_discrete_sequence=["#1f77b4", "#d62728"]
 )
-st.plotly_chart(fig4, use_container_width=True)
 
+fig4.update_traces(line=dict(width=2), marker=dict(size=6), fill='toself', opacity=0.4)
+st.plotly_chart(fig4, use_container_width=True)
 st.dataframe(compare_df)
