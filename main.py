@@ -14,7 +14,7 @@ st.set_page_config(
 @st.cache_data
 def load_data():
      df = pd.read_csv("data/EA_FC25_Player_Data.csv")
-     # clean column names (in case they may contain spaces)
+     # clean column names (in case they may contain sPacs)
      df.columns = [c.strip().title() for c in df.columns]
      return df
 
@@ -126,7 +126,7 @@ st.plotly_chart(fig3, use_container_width=True)
 
 # --- PLAYER COMPARISON ---
 st.markdown("---")
-st.markdown("## ⚔️ Player Comparison")
+st.markdown("## Player Comparison")
 
 colA, colB = st.columns(2)
 with colA:
@@ -157,3 +157,52 @@ fig4 = px.line_polar(
 fig4.update_traces(line=dict(width=2), marker=dict(size=6), fill='toself', opacity=0.4)
 st.plotly_chart(fig4, use_container_width=True)
 st.dataframe(compare_df)
+
+
+st.header("Scouting Mode — Find Hidden Gems")
+
+# Filter young players
+young_players = filtered_df[filtered_df["Age"] <= 25].copy()
+
+# Compute potential-like index
+young_players["Potential_Index"] = (
+    young_players["Ovr"] +
+    0.3 * young_players["Pac"] +
+    0.3 * young_players["Dri"] +
+    0.3 * young_players["Pas"] -
+    0.1 * young_players["Age"]
+)
+
+# Player role selection
+role = st.selectbox("Select role", ["All", "Attackers", "Midfielders", "Defenders", "Goalkeepers"])
+
+if role == "Attackers":
+    positions = ["ST", "CF", "LW", "RW", "LF", "RF"]
+    young_players = young_players[young_players["Position"].isin(positions)]
+elif role == "Midfielders":
+    positions = ["CM", "CDM", "CAM", "RM", "LM"]
+    young_players = young_players[young_players["Position"].isin(positions)]
+elif role == "Defenders":
+    positions = ["CB", "LB", "RB", "LWB", "RWB"]
+    young_players = young_players[young_players["Position"].isin(positions)]
+elif role == "Goalkeepers":
+    positions = ["GK"]
+    young_players = young_players[young_players["Position"].isin(positions)]
+
+# Top N slider
+top_n = st.slider("Show top N players", 5, 35, 10)
+top_young = young_players.sort_values("Potential_Index", ascending=False).head(top_n)
+
+st.subheader(f"Top {top_n} Young Talents ({role})")
+st.dataframe(top_young[["Name", "Age", "Ovr", "Position", "Team", "League", "Potential_Index"]])
+
+#Visualization
+fig = px.bar(
+    top_young,
+    x="Name",
+    y="Potential_Index",
+    color="Ovr",
+    hover_data=["Team", "League", "Age", "Position"],
+    title=f"Top {top_n} {role} by Potential Index"
+)
+st.plotly_chart(fig, use_container_width=True)
